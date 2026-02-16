@@ -7,14 +7,14 @@
 </head>
 <body>
 
-<!-- TOP BAR -->
+
 <div class="topbar">
     <h2>🐞 Issue Tracker</h2>
 </div>
 
 <div class="page-layout">
 
-    <!-- SIDEBAR -->
+    
     <div class="sidebar">
         <ul>
             <li class="active"><a href="create-issue.html">➕ Create Issue</a></li>
@@ -23,26 +23,26 @@
         </ul>
     </div>
 
-    <!-- MAIN CONTENT -->
+   
     <div class="main-container">
         <h3>Create New Issue</h3>
 
         <form onsubmit="saveIssue(event)">
 
-            <!-- BASIC INFORMATION -->
+          
             <div class="form-card">
                 <h4>Basic Information</h4>
 
-                <!-- Subject -->
+              
                 <label>Subject</label>
                 <input id="subject" type="text" placeholder="Enter issue subject" required>
 
-                <!-- Description -->
+               
                 <label>Description</label>
                 <textarea id="description" rows="4"
                     placeholder="Describe the issue in detail"></textarea>
 
-                <!-- Category -->
+                
                 <label>Category</label>
                 <select id="category">
                     <option selected>Category 1</option>
@@ -50,11 +50,11 @@
                     <option>Category 3</option>
                 </select>
 
-                <!-- Status (auto) -->
+                
                 <label>Status</label>
                 <input id="status" type="text" value="Open" readonly>
 
-                <!-- Severity -->
+                
                 <label>Severity</label>
                 <select id="severity">
                     <option selected>Low</option>
@@ -64,7 +64,7 @@
                 </select>
 
 
-                <!-- Assignee -->
+               
                 <label>Assignee</label>
                 <select id="assignee">
                     <option selected>Developer A</option>
@@ -73,7 +73,7 @@
                 </select>
             </div>
 
-            <!-- ACTION BUTTONS -->
+            
             <div class="form-actions">
                 <button type="submit" class="filter-btn">Create Issue</button>
                 <button type="button" class="reset-btn" onclick="cancelIssue()">
@@ -85,7 +85,7 @@
     </div>
 </div>
 
-<!-- ================= JS ================= -->
+
 <script>
 const user = localStorage.getItem("loggedInUser");
 document.getElementById("welcomeUser").innerText = `Welcome, ${user}`;
@@ -93,7 +93,7 @@ document.getElementById("welcomeUser").innerText = `Welcome, ${user}`;
 function saveIssue(event) {
     event.preventDefault();
 
-    // ✅ get logged-in user
+    
     const reporter = localStorage.getItem("loggedInUser") || "User";
 
     fetch("http://127.0.0.1:5000/create-issue", {
@@ -104,7 +104,7 @@ function saveIssue(event) {
             category: document.getElementById("category").value,
             status: document.getElementById("status").value,
             severity: document.getElementById("severity").value,
-            reporter: reporter,              // ✅ AUTO SET
+            reporter: reporter,             
             assignee: document.getElementById("assignee").value,
             description: document.getElementById("description").value
         })
