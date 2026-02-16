@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* INLINE DESCRIPTION FRAGMENT */
         .issue-row {
             cursor: pointer;
         }
@@ -27,7 +26,7 @@
 </head>
 <body>
 
-<!-- TOP NAVBAR -->
+
 <div class="topbar">
     <h2>🐞 Issue Tracker</h2>
     <div class="top-right">
@@ -38,7 +37,7 @@
 
 <div class="page-layout">
 
-    <!-- SIDEBAR -->
+  
     <div class="sidebar">
         <ul>
             <li><a href="create-issue.html">➕ Create Issue</a></li>
@@ -47,19 +46,16 @@
         </ul>
     </div>
 
-    <!-- MAIN CONTENT -->
+    
     <div class="main-container">
 
-        <!-- FILTER BAR -->
-        <!-- FILTER BAR -->
+       
 <div class="filter-bar">
     <input
         type="text"
         id="searchText"
         placeholder="Search by ID or Subject"
     >
-   
-
 
     <select id="status">
         <option value="">Status</option>
@@ -119,7 +115,7 @@
     </div>
 </div>
 
-<!-- EDIT ISSUE PANEL -->
+
 <div id="editPanel" class="edit-panel">
     <div class="edit-header">
         <h3>Edit Issue</h3>
@@ -201,14 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(renderTable);
 });
 
-/* TOGGLE DESCRIPTION */
+
 function toggleDescription(id) {
     const row = document.getElementById(`desc-${id}`);
     row.style.display = row.style.display === "none" ? "table-row" : "none";
 }
 
-
-/* RENDER TABLE */
 function renderTable(data) {
 
     
@@ -259,7 +253,7 @@ function renderTable(data) {
       </td>
     </tr>
 
-    <!-- DESCRIPTION ROW -->
+  
     <tr id="desc-${issue.id}" class="desc-row" style="display:none;">
       <td colspan="10">
         <div class="description-box">
@@ -273,7 +267,7 @@ function renderTable(data) {
 }
 
 
-/* FORMAT DATE */
+
 function formatDateTime(dateStr) {
      if (!dateStr) return ""; 
      const isoString = dateStr.replace(" ", "T");
@@ -342,7 +336,7 @@ function fetchWithFilters() {
 
 
 
-/* EDIT PANEL */
+
 function openEditPanel(id, status, category, severity, assignee, description) {
 
     document.getElementById("editIssueId").value = id;
@@ -383,12 +377,11 @@ function saveEditIssue() {
 
     let close_reason = null;
 
-    /* 🔁 REOPEN LOGIC (FIXED) */
     if (originalStatus === "Closed" && status !== "Closed") {
         status = "Reopened";
     }
 
-    /* 🔒 CLOSE REASON ONLY IF CLOSED */
+    
     if (status === "Closed") {
         close_reason = document.getElementById("closeReason").value || null;
     }
