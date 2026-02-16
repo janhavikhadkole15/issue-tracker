@@ -9,7 +9,7 @@
 
 <div class="container">
 
-    <!-- LEFT SIGNUP SECTION -->
+   
     <div class="login-section">
         <div class="logo">🐞 IssueTracker</div>
 
@@ -53,7 +53,7 @@
 
     </div>
 
-    <!-- RIGHT INFO SECTION -->
+    
     <div class="info-section">
         <h1>Join Issue Tracker</h1>
 
@@ -83,7 +83,7 @@ function signup(event) {
 
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // check existing email
+   
     if (users.some(u => u.email === email)) {
         alert("Account already exists. Please login.");
         window.location.href = "login.html";
