@@ -18,7 +18,7 @@ def get_issues():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # ✅ DEFINE VARIABLES FIRST
+  
     search = request.args.get("search")
     status = request.args.get("status")
     category = request.args.get("category")
@@ -28,7 +28,7 @@ def get_issues():
     query = "SELECT * FROM issues WHERE 1=1"
     values = []
 
-    # 🔍 Search filter
+   
     if search and search.strip():
         search = search.strip()
         if search.isdigit():
@@ -38,22 +38,22 @@ def get_issues():
             query += " AND subject LIKE %s"
             values.append(f"%{search}%")
 
-    # 🔽 Status filter
+    
     if status and status.strip():
         query += " AND status = %s"
         values.append(status)
 
-    # 🗂 Category filter
+   
     if category and category.strip():
         query += " AND category = %s"
         values.append(category)
 
-    # 📅 From date
+   
     if from_date and from_date.strip():
         query += " AND created_date >= %s"
         values.append(from_date.strip() + " 00:00:00")
 
-    # 📅 To date
+  
     if to_date and to_date.strip():
         query += " AND created_date <= %s"
         values.append(to_date.strip() + " 23:59:59")
@@ -63,7 +63,7 @@ def get_issues():
     cursor.execute(query, values)
     data = cursor.fetchall()
 
-    # Format dates
+    
     for issue in data:
         issue["created_date"] = (
             issue["created_date"].strftime("%Y-%m-%d %H:%M:%S")
@@ -127,7 +127,7 @@ def update_issue(issue_id):
     status = data.get("status")
     close_reason = data.get("close_reason")
 
-# 🔁 Clear close_reason if reopened
+
     if status == "Reopened":
         close_reason = None
 
@@ -196,7 +196,7 @@ def get_reports():
 
     reports = {}
 
-    # Status summary
+    
     cursor.execute("""
         SELECT status, COUNT(*) as count
         FROM issues
@@ -204,7 +204,7 @@ def get_reports():
     """)
     reports["status"] = cursor.fetchall()
 
-    # Category summary
+ 
     cursor.execute("""
         SELECT category, COUNT(*) as count
         FROM issues
@@ -212,7 +212,7 @@ def get_reports():
     """)
     reports["category"] = cursor.fetchall()
 
-    # Severity summary
+    
     cursor.execute("""
         SELECT severity, COUNT(*) as count
         FROM issues
@@ -220,7 +220,7 @@ def get_reports():
     """)
     reports["severity"] = cursor.fetchall()
 
-    # Assignee workload
+  
     cursor.execute("""
         SELECT assignee, COUNT(*) as count
         FROM issues
@@ -228,7 +228,7 @@ def get_reports():
     """)
     reports["assignee"] = cursor.fetchall()
 
-    # ✅ Closed issue reasons
+    
     cursor.execute("""
         SELECT close_reason, COUNT(*) as count
         FROM issues
