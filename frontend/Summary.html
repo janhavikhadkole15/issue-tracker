@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Summary Report</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <h2>🐞 Issue Tracker</h2>
+</div>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <ul>
+            <li><a href="create-issue.html">➕ Create Issue</a></li>
+            <li><a href="dashboard.html">📋 Issues</a></li>
+            <li class="active"><a href="Summary.html">📊 Summary</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+
+        <h2>Summary</h2><br>
+
+        <!-- ===================== -->
+        <!-- STATUS CARDS -->
+        <!-- ===================== -->
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h4>Total Issues</h4>
+                <p id="totalCount">0</p>
+            </div>
+
+            <div class="stat-card success">
+                <h4>Closed</h4>
+                <p id="closedCount">0</p>
+            </div>
+
+            <div class="stat-card warning">
+                <h4>Open</h4>
+                <p id="openCount">0</p>
+            </div>
+
+            <div class="stat-card info">
+                <h4>In Progress</h4>
+                <p id="inProgressCount">0</p>
+            </div>
+        
+
+        <div class="stat-card success">
+        <h4>Reopened</h4>
+        <p id="resolvedCount">0</p>
+    </div>
+    </div>
+
+        <!-- closed issue -->
+
+        <div class="report-card">
+    <div class="report-header" onclick="toggleReport(this)">
+        <h3>Closed Issue </h3>
+        <span>▼</span>
+    </div>
+
+    <div class="report-body">
+        <div class="reason-grid" id="closeReasonGrid"></div>
+    </div>
+</div>
+
+        <!-- ===================== -->
+        <!-- ISSUES BY CATEGORY -->
+        <!-- ===================== -->
+        <div class="report-card">
+    <div class="report-header" onclick="toggleReport(this)">
+        <h3>Issues by Category</h3>
+        <span>▼</span>
+    </div>
+    <div class="report-body">
+        <div class="reason-grid" id="categoryGrid"></div>
+    </div>
+</div>
+
+
+        <!-- ===================== -->
+        <!-- ISSUES BY SEVERITY -->
+        <!-- ===================== -->
+        <div class="report-card">
+    <div class="report-header" onclick="toggleReport(this)">
+        <h3>Issues by Severity</h3>
+        <span>▼</span>
+    </div>
+    <div class="report-body">
+        <div class="reason-grid" id="severityGrid"></div>
+    </div>
+</div>
+
+
+        <!-- ASSIGNEE WORKLOAD -->
+
+        <div class="report-card">
+    <div class="report-header" onclick="toggleReport(this)">
+        <h3>Assignee Workload</h3>
+        <span>▼</span>
+    </div>
+    <div class="report-body">
+        <div class="reason-grid" id="assigneeGrid"></div>
+    </div>
+</div>
+
+
+    </div>
+</div>
+
+<!-- ===================== -->
+<!-- JAVASCRIPT -->
+<!-- ===================== -->
+<script>
+fetch("http://127.0.0.1:5000/reports")
+  .then(res => res.json())
+  .then(data => {
+
+    let total = 0;
+    let open = 0;
+    let closed = 0;
+    let inProgress = 0;
+    let reopened = 0;
+
+    // 🔢 STATUS COUNTS
+    data.status.forEach(item => {
+      total += item.count;
+
+      if (item.status === "Open") open = item.count;
+      if (item.status === "Closed") closed = item.count;
+      if (item.status === "In Progress") inProgress = item.count;
+      if (item.status === "Reopened") reopened = item.count;
+    });
+
+    // ✅ UPDATE SUMMARY CARDS
+    document.getElementById("totalCount").innerText = total;
+    document.getElementById("openCount").innerText = open;
+    document.getElementById("closedCount").innerText = closed;
+    document.getElementById("inProgressCount").innerText = inProgress;
+    document.getElementById("resolvedCount").innerText = reopened;
+
+    // ✅ DETAIL GRIDS
+    renderCards("closeReasonGrid", data.close_reason, "close_reason");
+    renderCards("categoryGrid", data.category, "category");
+    renderCards("severityGrid", data.severity, "severity");
+    renderCards("assigneeGrid", data.assignee, "assignee");
+  })
+  .catch(err => {
+    console.error("Summary error:", err);
+  });
+
+function renderCards(containerId, items, key) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+
+  if (!items || items.length === 0) {
+    container.innerHTML = "<p>No data</p>";
+    return;
+  }
+
+  items.forEach(item => {
+    if (!item[key]) return;
+
+    container.innerHTML += `
+      <div class="reason-card">
+        <p>${item[key]}</p>
+        <h3>${item.count}</h3>
+      </div>
+    `;
+  });
+}
+
+function toggleReport(header) {
+  const card = header.parentElement;
+  card.classList.toggle("active");
+}
+</script>
+
+
+
+</body>
+</html>

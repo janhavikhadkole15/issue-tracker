@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Issue Tracker</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* INLINE DESCRIPTION FRAGMENT */
+        .issue-row {
+            cursor: pointer;
+        }
+
+        .desc-row td {
+            background: #f9fafb;
+            padding: 0;
+        }
+
+        .desc-box {
+            padding: 15px 20px;
+            border-left: 4px solid #0b5c5c;
+            background: #ffffff;
+            font-size: 14px;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<div class="topbar">
+    <h2>🐞 Issue Tracker</h2>
+    <div class="top-right">
+        <span id="welcomeUser"></span>
+<a href="#" onclick="logout()">Logout</a>
+    </div>
+</div>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <ul>
+            <li><a href="create-issue.html">➕ Create Issue</a></li>
+            <li class="active"><a href="dashboard.html">📋 Issues</a></li>
+            <li><a href="Summary.html">📊 Summary</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+
+        <!-- FILTER BAR -->
+        <!-- FILTER BAR -->
+<div class="filter-bar">
+    <input
+        type="text"
+        id="searchText"
+        placeholder="Search by ID or Subject"
+    >
+   
+
+
+    <select id="status">
+        <option value="">Status</option>
+        <option value="Open">Open</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Closed">Closed</option>
+         <option value="Reopened">Reopened</option>
+        
+    </select>
+
+    <select id="category">
+        <option value="">Category</option>
+        <option value="Category 1">Category 1</option>
+        <option value="Category 2">Category 2</option>
+        <option value="UCategory 3">Category 3</option>
+        
+    </select>
+
+    
+    <input type="date" id="fromDate">
+    
+    <button id="searchBtn" class="search-btn">Search</button>
+    <button id="resetBtn" class="reset-btn">Reset</button>
+</div>
+
+        <div class="table-container">
+            <table>
+               <div id="noDataMessage" style="
+    display:none;
+    background:#ffffff;
+    padding:30px;
+    border-radius:2px;
+    text-align:center;
+    font-size:18px;
+">
+    🔍Issue not found
+</div>
+
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Severity</th>
+                        <th>Reporter</th>
+                        <th>Assignee</th>
+                        <th>Created Date</th>
+                        <th>Last Update</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="issueTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT ISSUE PANEL -->
+<div id="editPanel" class="edit-panel">
+    <div class="edit-header">
+        <h3>Edit Issue</h3>
+        <span class="close-btn" onclick="closeEditPanel()">×</span>
+    </div>
+
+    <div class="edit-body">
+        <input type="hidden" id="editIssueId">
+        <input type="hidden" id="originalStatus">
+
+
+
+       <label>Status</label>
+<select id="editStatus">
+    <option>Open</option>
+    <option>In Progress</option>
+    <option>Closed</option>
+</select>
+
+<label>Category</label>
+<select id="editCategory">
+    <option>Category 1</option>
+    <option>Category 2</option>
+    <option>Category 3</option>
+</select>
+
+<label>Severity</label>
+<select id="editSeverity">
+    <option>Low</option>
+    <option>Medium</option>
+    <option>High</option>
+    <option>Critical</option>
+</select>
+
+<label>Assignee</label>
+<select id="editAssignee">
+    <option>Developer A</option>
+    <option>Developer B</option>
+    <option>Developer C</option>
+</select>
+
+<label>Description</label>
+<textarea id="editDescription" rows="4"
+    placeholder="Update description"></textarea>
+
+
+        <div id="closeReasonWrapper" style="display:none">
+            <label>Close Reason</label>
+            <select id="closeReason">
+                <option>Fixed</option>
+                <option>Duplicate</option>
+                <option>Rejected</option>
+                <option>Deferred</option>
+                <option>Not a Bug</option>
+            </select>
+        </div>
+
+        <button class="save-btn" onclick="saveEditIssue()">Save</button>
+        <button class="reset-btn" onclick="closeEditPanel()">Cancel</button>
+    </div>
+</div>
+
+<script>
+
+    const user = localStorage.getItem("loggedInUser");
+document.getElementById("welcomeUser").innerText = `Welcome, ${user}`;
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) {
+        window.location.href = "login.html";
+    }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetch("http://127.0.0.1:5000/issues")
+        .then(res => res.json())
+        .then(renderTable);
+});
+
+/* TOGGLE DESCRIPTION */
+function toggleDescription(id) {
+    const row = document.getElementById(`desc-${id}`);
+    row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+
+
+/* RENDER TABLE */
+function renderTable(data) {
+
+    
+    const tbody = document.getElementById("issueTableBody");
+    tbody.innerHTML = "";
+
+    data.forEach(issue => {
+  tbody.innerHTML += `
+    <tr class="issue-row" onclick="toggleDescription(${issue.id})">
+      <td>${issue.id}</td>
+      <td>${issue.subject}</td>
+      <td>${issue.category || "-"}</td>
+      <td>
+        <span class="badge status-${(issue.status || "").toLowerCase().replace(" ", "")}">
+          ${issue.status}
+        </span>
+      </td>
+      <td>
+        <span class="badge sev-${(issue.severity || "").toLowerCase()}">
+          ${issue.severity}
+        </span>
+      </td>
+      <td>${issue.reporter || "-"}</td>
+      <td>${issue.assignee || "-"}</td>
+      <td>${formatDateTime(issue.created_date)}</td>
+      <td>${formatDateTime(issue.last_update)}</td>
+      <td>
+  <div class="action-btns">
+    <button class="btn-edit"
+      onclick="event.stopPropagation(); openEditPanel(
+        ${issue.id},
+        '${issue.status}',
+        '${issue.category}',
+        '${issue.severity}',
+        '${issue.assignee}',
+        \`${issue.description || ""}\`
+      )">
+      Edit
+    </button>
+
+    <button class="btn-delete"
+      onclick="event.stopPropagation(); deleteIssue(${issue.id})">
+      Delete
+    </button>
+  </div>
+</td>
+
+      </td>
+    </tr>
+
+    <!-- DESCRIPTION ROW -->
+    <tr id="desc-${issue.id}" class="desc-row" style="display:none;">
+      <td colspan="10">
+        <div class="description-box">
+          <strong>Description:</strong><br>
+          ${issue.description || "No description provided"}
+        </div>
+      </td>
+    </tr>
+  `;
+});
+}
+
+
+/* FORMAT DATE */
+function formatDateTime(dateStr) {
+     if (!dateStr) return ""; 
+     const isoString = dateStr.replace(" ", "T");
+      const date = new Date(isoString); return date.toLocaleString("en-IN", 
+      { day: "2-digit",
+       month: "short",
+        year: "numeric", 
+        hour: "2-digit",
+         minute: "2-digit",
+          hour12: true 
+        });
+     }
+
+document.getElementById("searchBtn").addEventListener("click", fetchWithFilters);
+document.getElementById("resetBtn").addEventListener("click", () => {
+    window.location.reload();
+});
+
+function formatDateForAPI(dateStr) {
+  if (!dateStr) return "";
+  const [dd, mm, yyyy] = dateStr.split("-");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function fetchWithFilters() {
+
+    const search = document.getElementById("searchText").value.trim();
+    const status = document.getElementById("status").value;
+    const category = document.getElementById("category").value;
+    const fromDate = document.getElementById("fromDate").value;
+    
+
+    let url = "http://127.0.0.1:5000/issues?";
+    const params = [];
+
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
+    if (status) params.push(`status=${encodeURIComponent(status)}`);
+    if (category) params.push(`category=${encodeURIComponent(category)}`);
+    if (fromDate) params.push(`from_date=${fromDate}`);
+    
+
+    url += params.join("&");
+
+    fetch(url)
+        .then(res => res.json())
+        .then(data => {
+
+    const noDataMsg = document.getElementById("noDataMessage");
+
+    function clearIssuesTable() {
+  document.getElementById("issueTableBody").innerHTML = "";
+}
+
+    if (!data || data.length === 0) {
+        noDataMsg.style.display = "block";
+        clearIssuesTable();   // optional but recommended
+        return;
+    }
+
+    noDataMsg.style.display = "none";
+    renderTable(data);
+});
+
+}
+
+
+
+
+/* EDIT PANEL */
+function openEditPanel(id, status, category, severity, assignee, description) {
+
+    document.getElementById("editIssueId").value = id;
+    document.getElementById("editStatus").value = status;
+    document.getElementById("editCategory").value = category;
+    document.getElementById("editSeverity").value = severity;
+    document.getElementById("editAssignee").value = assignee;
+    document.getElementById("editDescription").value = description || "";
+
+    document.getElementById("editPanel").classList.add("active");
+    document.getElementById("originalStatus").value = status;
+
+    document.getElementById("closeReasonWrapper").style.display =
+        status === "Closed" ? "block" : "none";
+
+
+}
+
+function closeEditPanel() {
+    document.getElementById("editPanel").classList.remove("active");
+}
+
+document.getElementById("editStatus").addEventListener("change", function () {
+    document.getElementById("closeReasonWrapper").style.display =
+        this.value === "Closed" ? "block" : "none";
+});
+
+function saveEditIssue() {
+    const id = document.getElementById("editIssueId").value;
+
+    let status = document.getElementById("editStatus").value;
+    const originalStatus = document.getElementById("originalStatus").value;
+
+    const category = document.getElementById("editCategory").value;
+    const severity = document.getElementById("editSeverity").value;
+    const assignee = document.getElementById("editAssignee").value;
+    const description = document.getElementById("editDescription").value || "";
+
+    let close_reason = null;
+
+    /* 🔁 REOPEN LOGIC (FIXED) */
+    if (originalStatus === "Closed" && status !== "Closed") {
+        status = "Reopened";
+    }
+
+    /* 🔒 CLOSE REASON ONLY IF CLOSED */
+    if (status === "Closed") {
+        close_reason = document.getElementById("closeReason").value || null;
+    }
+
+    if (!status || !severity || !assignee) {
+        alert("Please fill all required fields");
+        return;
+    }
+
+
+
+    fetch(`http://127.0.0.1:5000/update-issue/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            status: status,
+            severity: severity,
+            category: category,
+            assignee: assignee,
+            description: description,
+            close_reason: close_reason
+        })
+    })
+    .then(res => {
+        if (!res.ok) {
+            throw new Error("Update failed");
+        }
+        return res.json();
+    })
+    .then(() => {
+        alert("Issue updated successfully");
+        closeEditPanel();
+        location.reload();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to update issue");
+    });
+}
+
+function deleteIssue(id) {
+    if (!confirm("Are you sure you want to delete this issue?")) return;
+
+    fetch(`http://127.0.0.1:5000/delete-issue/${id}`, {
+        method: "DELETE"
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Delete failed");
+        return res.json();
+    })
+    .then(() => {
+        alert("Issue deleted successfully");
+        location.reload();
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to delete issue");
+    });
+}
+function logout() {
+    localStorage.clear();
+    window.location.href = "login.html";
+}
+
+
+
+</script>
+
+</body>
+</html>

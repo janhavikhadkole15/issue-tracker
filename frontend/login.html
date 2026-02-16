@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Issue Tracker Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT LOGIN SECTION -->
+    <div class="login-section">
+        <div class="logo">🐞 IssueTracker</div>
+
+        <h2 class="main-title">
+            Manage Issues.<br>
+            Track Progress.<br>
+            Fix Faster.
+        </h2>
+
+        <p class="subtitle">
+            Sign in to your Issue Tracker dashboard
+        </p>
+
+       <form onsubmit="login(event)">
+
+    <label>Email</label>
+    <input id="email" type="email" required>
+
+    <label>Password</label>
+    <input id="password" type="password" required>
+
+    <div class="options">
+        <a href="#">Forgot Password?</a>
+    </div>
+
+    <button type="submit">Sign In</button>
+
+    <div class="divider">OR</div>
+
+    <p class="signup">
+        Don’t have an account? <a href="signup.html">Sign Up</a>
+    </p>
+</form>
+
+    </div>
+
+    <!-- RIGHT IMAGE SECTION -->
+    <div class="info-section">
+        <h1>Smart Issue Tracking</h1>
+
+        <p class="quote">
+            Report, assign, and resolve issues<br>
+            with clarity and speed.
+        </p>
+
+        <img src="loginpage_img.png" alt="Issue Tracker Illustration" class="illustration">
+    </div>
+<script>
+function login(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+
+    const user = users.find(
+        u => u.email === email && u.password === password
+    );
+
+    if (!user) {
+        alert("Invalid email or password");
+        return;
+    }
+
+    // store login session
+    localStorage.setItem("loggedInUser", user.name);
+    localStorage.setItem("userRole", user.role);
+
+    window.location.href = "dashboard.html";
+}
+</script>
+
+</div>
+
+</body>
+</html>

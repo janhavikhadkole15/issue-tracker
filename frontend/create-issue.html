@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Issue</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+    <h2>🐞 Issue Tracker</h2>
+</div>
+
+<div class="page-layout">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <ul>
+            <li class="active"><a href="create-issue.html">➕ Create Issue</a></li>
+            <li><a href="dashboard.html">📋 Issues</a></li>
+            <li><a href="Summary.html">📊 Summary</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <h3>Create New Issue</h3>
+
+        <form onsubmit="saveIssue(event)">
+
+            <!-- BASIC INFORMATION -->
+            <div class="form-card">
+                <h4>Basic Information</h4>
+
+                <!-- Subject -->
+                <label>Subject</label>
+                <input id="subject" type="text" placeholder="Enter issue subject" required>
+
+                <!-- Description -->
+                <label>Description</label>
+                <textarea id="description" rows="4"
+                    placeholder="Describe the issue in detail"></textarea>
+
+                <!-- Category -->
+                <label>Category</label>
+                <select id="category">
+                    <option selected>Category 1</option>
+                    <option>Category 2</option>
+                    <option>Category 3</option>
+                </select>
+
+                <!-- Status (auto) -->
+                <label>Status</label>
+                <input id="status" type="text" value="Open" readonly>
+
+                <!-- Severity -->
+                <label>Severity</label>
+                <select id="severity">
+                    <option selected>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                </select>
+
+
+                <!-- Assignee -->
+                <label>Assignee</label>
+                <select id="assignee">
+                    <option selected>Developer A</option>
+                    <option>Developer B</option>
+                    <option>Developer C</option>
+                </select>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="form-actions">
+                <button type="submit" class="filter-btn">Create Issue</button>
+                <button type="button" class="reset-btn" onclick="cancelIssue()">
+                    Cancel
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- ================= JS ================= -->
+<script>
+const user = localStorage.getItem("loggedInUser");
+document.getElementById("welcomeUser").innerText = `Welcome, ${user}`;
+
+function saveIssue(event) {
+    event.preventDefault();
+
+    // ✅ get logged-in user
+    const reporter = localStorage.getItem("loggedInUser") || "User";
+
+    fetch("http://127.0.0.1:5000/create-issue", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            subject: document.getElementById("subject").value,
+            category: document.getElementById("category").value,
+            status: document.getElementById("status").value,
+            severity: document.getElementById("severity").value,
+            reporter: reporter,              // ✅ AUTO SET
+            assignee: document.getElementById("assignee").value,
+            description: document.getElementById("description").value
+        })
+    })
+    .then(res => res.json())
+    .then(() => {
+        alert("Issue created successfully");
+        window.location.href = "dashboard.html";
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Failed to create issue");
+    });
+}
+
+function cancelIssue() {
+    if (confirm("Are you sure you want to cancel?")) {
+        window.location.href = "dashboard.html";
+    }
+}
+</script>
+
+</body>
+</html>
