@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<!-- TOP BAR -->
+
 <div class="topbar">
     <h2>🐞 Issue Tracker</h2>
 </div>
@@ -28,9 +28,7 @@
 
         <h2>Summary</h2><br>
 
-        <!-- ===================== -->
-        <!-- STATUS CARDS -->
-        <!-- ===================== -->
+    
         <div class="stats-cards">
             <div class="stat-card">
                 <h4>Total Issues</h4>
@@ -59,7 +57,7 @@
     </div>
     </div>
 
-        <!-- closed issue -->
+      
 
         <div class="report-card">
     <div class="report-header" onclick="toggleReport(this)">
@@ -72,9 +70,7 @@
     </div>
 </div>
 
-        <!-- ===================== -->
-        <!-- ISSUES BY CATEGORY -->
-        <!-- ===================== -->
+       
         <div class="report-card">
     <div class="report-header" onclick="toggleReport(this)">
         <h3>Issues by Category</h3>
@@ -86,9 +82,7 @@
 </div>
 
 
-        <!-- ===================== -->
-        <!-- ISSUES BY SEVERITY -->
-        <!-- ===================== -->
+       
         <div class="report-card">
     <div class="report-header" onclick="toggleReport(this)">
         <h3>Issues by Severity</h3>
@@ -100,7 +94,7 @@
 </div>
 
 
-        <!-- ASSIGNEE WORKLOAD -->
+   
 
         <div class="report-card">
     <div class="report-header" onclick="toggleReport(this)">
@@ -116,9 +110,8 @@
     </div>
 </div>
 
-<!-- ===================== -->
 <!-- JAVASCRIPT -->
-<!-- ===================== -->
+
 <script>
 fetch("http://127.0.0.1:5000/reports")
   .then(res => res.json())
@@ -130,7 +123,7 @@ fetch("http://127.0.0.1:5000/reports")
     let inProgress = 0;
     let reopened = 0;
 
-    // 🔢 STATUS COUNTS
+    
     data.status.forEach(item => {
       total += item.count;
 
@@ -140,14 +133,14 @@ fetch("http://127.0.0.1:5000/reports")
       if (item.status === "Reopened") reopened = item.count;
     });
 
-    // ✅ UPDATE SUMMARY CARDS
+  
     document.getElementById("totalCount").innerText = total;
     document.getElementById("openCount").innerText = open;
     document.getElementById("closedCount").innerText = closed;
     document.getElementById("inProgressCount").innerText = inProgress;
     document.getElementById("resolvedCount").innerText = reopened;
 
-    // ✅ DETAIL GRIDS
+  
     renderCards("closeReasonGrid", data.close_reason, "close_reason");
     renderCards("categoryGrid", data.category, "category");
     renderCards("severityGrid", data.severity, "severity");
