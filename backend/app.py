@@ -84,7 +84,7 @@ def get_issues():
 @app.route("/create-issue", methods=["POST"])
 def create_issue():
     data = request.get_json(force=True)
-    print("✅ FINAL DATA:", data)
+    print(" FINAL DATA:", data)
 
     now = datetime.now(IST)
 
@@ -115,14 +115,14 @@ def create_issue():
         return jsonify({"message": "Issue created successfully"}), 201
 
     except Exception as e:
-        print("❌ INSERT ERROR:", e)
+        print(" INSERT ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 
 @app.route("/update-issue/<int:issue_id>", methods=["PUT"])
 def update_issue(issue_id):
     data = request.get_json(force=True)
-    print("🔁 UPDATE DATA:", data)
+    print(" UPDATE DATA:", data)
 
     status = data.get("status")
     close_reason = data.get("close_reason")
@@ -168,7 +168,7 @@ def update_issue(issue_id):
         return jsonify({"message": "Issue updated successfully"})
 
     except Exception as e:
-        print("❌ UPDATE ERROR:", e)
+        print(" UPDATE ERROR:", e)
         return jsonify({"error": str(e)}), 500
 
 
